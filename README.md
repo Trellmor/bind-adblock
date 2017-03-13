@@ -13,6 +13,8 @@ Uses the following sources:
 * [MVPS HOSTS](http://winhelp2002.mvps.org/)
 * [Adaway default blocklist](https://adaway.org/hosts.txt)
 * [hpHosts Ad and Tracking servers only](https://hosts-file.net/)
+* [Dan Pollock's hosts file](http://someonewhocares.org/hosts/zero/)
+* [MalwareDomainList.com Hosts List](https://www.malwaredomainlist.com/hostslist/hosts.txt)
 
 ## Setup
 
