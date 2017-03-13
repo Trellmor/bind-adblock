@@ -36,7 +36,7 @@ import subprocess
 lists = [
     {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0'},
     {'url': 'http://mirror1.malwaredomains.com/files/justdomains'},
-    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': '^0\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
+    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
     {'url': 'https://adaway.org/hosts.txt', 'regex': '^127\\.0\\.0\\.1 (?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
     {'url': 'https://hosts-file.net/ad_servers.txt', 'regex': '^127\\.0\\.0\\.1\\s+(?P<domain>([a-z0-9\\-]+\\.)+[a-z]+)$'},
     {'url': 'http://someonewhocares.org/hosts/zero/', 'regex': '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
