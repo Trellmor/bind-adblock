@@ -39,6 +39,12 @@ zone "rpz.example.com" {
 };
 ```
 
+Create a zone file for your zone. Replace example.com with the domain you used before.
+```
+@ 3600 IN SOA @ admin.example.com. 0 86400 7200 2592000 86400
+@ 3600 IN NS ns.example.com.
+```
+
 ## Usage
 
     update-zonefile.py zonefile origin
