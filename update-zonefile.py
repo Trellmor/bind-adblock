@@ -53,7 +53,10 @@ def download_list(url):
 
     if cache.is_file():
         last_modified = datetime.utcfromtimestamp(cache.stat().st_mtime)
-        headers = {'If-modified-since': eut.format_datetime(last_modified)}
+        headers = {
+                'If-modified-since': eut.format_datetime(last_modified),
+                'User-Agent': 'Bind adblock zonfile updater v1.0 (https://github.com/Trellmor/bind-adblock)'
+                }
 
     try:
         r = requests.get(url, headers=headers)
