@@ -55,17 +55,20 @@ def download_list(url):
         last_modified = datetime.utcfromtimestamp(cache.stat().st_mtime)
         headers = {'If-modified-since': eut.format_datetime(last_modified)}
 
-    r = requests.get(url, headers=headers)
+    try:
+        r = requests.get(url, headers=headers)
 
-    if r.status_code == 200:
-        with cache.open('w') as f:
-            f.write(r.text)
+        if r.status_code == 200:
+            with cache.open('w') as f:
+                f.write(r.text)
             
-        if 'last-modified' in r.headers:
-            last_modified = eut.parsedate_to_datetime(r.headers['last-modified']).timestamp()
-            os.utime(str(cache), times=(last_modified, last_modified))
+            if 'last-modified' in r.headers:
+                last_modified = eut.parsedate_to_datetime(r.headers['last-modified']).timestamp()
+                os.utime(str(cache), times=(last_modified, last_modified))
 
-        return r.text
+            return r.text
+    except requests.exceptions.RequestException as e:
+        print(e)
 
     if cache.is_file():
         with cache.open() as f:
