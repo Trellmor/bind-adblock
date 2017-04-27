@@ -90,12 +90,18 @@ def parse_lists():
             c = len(domains)
 
             for line in data.splitlines():
+                domain = ''
+
                 if 'regex' in l:
                     m = re.match(l['regex'], line)
                     if m:
-                        domains.add(m.group('domain'))
+                        domain = m.group('domain')
                 else:
-                    domains.add(line)
+                    domain = line
+
+                domain = domain.strip()
+                if domain != '':
+                    domains.add(domain)
 
             print("\t{} domains".format(len(domains) - c))
 
