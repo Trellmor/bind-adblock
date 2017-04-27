@@ -44,7 +44,7 @@ lists = [
 ]
 
 def download_list(url):
-    headers = None;
+    headers = None
 
     cache = Path('.cache', 'bind_adblock')
     if not cache.is_dir():
@@ -100,7 +100,7 @@ def parse_lists():
             print("\t{} domains".format(len(domains) - c))
 
     print("\nTotal\n\t{} domains".format(len(domains)))
-    return domains;
+    return domains
 
 def load_zone(zonefile, origin):
     zone_text = ''
@@ -122,8 +122,8 @@ def reload_zone(origin):
         raise Exception('rndc failed with return code {}'.format(r))
 
 def usage(code=0):
-    print('Usage: update-zonefile.py zonefile origin');
-    exit(code);
+    print('Usage: update-zonefile.py zonefile origin')
+    exit(code)
 
 if len(sys.argv) != 3:
     usage(1)
