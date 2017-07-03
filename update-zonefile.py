@@ -31,6 +31,8 @@ import hashlib
 import re
 import sys
 import dns.zone
+import dns.name
+from dns.exception import DNSException
 import subprocess
 
 lists = [
@@ -77,8 +79,20 @@ def download_list(url):
         with cache.open() as f:
             return f.read()
 
-def parse_lists():
+def check_domain(domain, origin):
+    if domain == '':
+        return False
+
+    try:
+        name = dns.name.from_text(domain, origin)
+    except DNSException as e:
+        return False
+
+    return True
+
+def parse_lists(origin):
     domains = set()
+    origin_name = dns.name.from_text(origin)
     for l in lists:
         data = download_list(l['url'])
         if data:
@@ -100,7 +114,7 @@ def parse_lists():
                     domain = line
 
                 domain = domain.strip()
-                if domain != '':
+                if check_domain(domain, origin_name):
                     domains.add(domain)
 
             print("\t{} domains".format(len(domains) - c))
@@ -140,7 +154,7 @@ origin = sys.argv[2]
 zone = load_zone(zonefile, origin)
 update_serial(zone)
 
-domains = parse_lists()
+domains = parse_lists(origin)
 
 zone.to_file(zonefile)
 
