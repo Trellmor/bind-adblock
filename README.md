@@ -18,6 +18,13 @@ Uses the following sources:
 
 ## Setup
 
+### Python packages
+
+* [requests](https://pypi.python.org/pypi/requests)
+* [dnspython](https://pypi.python.org/pypi/dnspython)
+
+These packages need to be installed to run the update script.
+
 ### Configure BIND
 
 Add the `response-policy` statement to the BIND options
