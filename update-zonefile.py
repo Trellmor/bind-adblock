@@ -35,6 +35,10 @@ import dns.name
 from dns.exception import DNSException
 import subprocess
 
+config = {
+    'req_timeout_s': 5
+}
+
 lists = [
     {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0'},
     {'url': 'http://mirror1.malwaredomains.com/files/justdomains'},
@@ -61,7 +65,7 @@ def download_list(url):
                 }
 
     try:
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=config['req_timeout_s'])
 
         if r.status_code == 200:
             with cache.open('w') as f:
