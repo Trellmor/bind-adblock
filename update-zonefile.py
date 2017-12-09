@@ -36,17 +36,40 @@ from dns.exception import DNSException
 import subprocess
 
 config = {
-    'req_timeout_s': 5
+    'req_timeout_s': 10
 }
+
+regex_wildcard_domain = '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'
+regex_localhost_domain = '^127\\.0\\.0\\.1[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'
 
 lists = [
     {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0'},
     {'url': 'http://mirror1.malwaredomains.com/files/justdomains'},
-    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
-    {'url': 'https://adaway.org/hosts.txt', 'regex': '^127\\.0\\.0\\.1 (?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
-    {'url': 'https://hosts-file.net/ad_servers.txt', 'regex': '^127\\.0\\.0\\.1\\s+(?P<domain>([a-z0-9\\-]+\\.)+[a-z]+)$'},
-    {'url': 'http://someonewhocares.org/hosts/zero/hosts', 'regex': '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
-    {'url': 'https://www.malwaredomainlist.com/hostslist/hosts.txt', 'regex': '^127\\.0\\.0\\.1\\s+(?P<domain>([a-z0-9\\-]+\\.)+[a-z]+)$'}
+    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': regex_wildcard_domain},
+    {'url': 'https://adaway.org/hosts.txt', 'regex': regex_localhost_domain},
+    {'url': 'https://hosts-file.net/ad_servers.txt', 'regex': regex_localhost_domain},
+    {'url': 'http://someonewhocares.org/hosts/zero/hosts', 'regex': regex_wildcard_domain},
+    {'url': 'https://www.malwaredomainlist.com/hostslist/hosts.txt', 'regex': regex_localhost_domain},
+
+    #
+    # adlists from pi-hole: https://github.com/pi-hole/pi-hole/blob/master/adlists.default
+    #
+    # The below list amalgamates several lists we used previously.
+    # See `https://github.com/StevenBlack/hosts` for details
+    # StevenBlack's list
+    {'url': 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts', 'regex': regex_wildcard_domain},
+
+    # Cameleon
+    {'url': 'http://sysctl.org/cameleon/hosts', 'regex': regex_localhost_domain},
+
+    # Zeustracker
+    {'url': 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist'},
+
+    # Disconnect.me Tracking
+    {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt'},
+
+    # Disconnect.me Ads
+    {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt'},
 ]
 
 def download_list(url):
