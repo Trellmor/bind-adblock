@@ -39,8 +39,8 @@ config = {
     'req_timeout_s': 10
 }
 
-regex_wildcard_domain = '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'
-regex_localhost_domain = '^127\\.0\\.0\\.1[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'
+regex_wildcard_domain = '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z0-9_-]+)$'
+regex_localhost_domain = '^127\\.0\\.0\\.1[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z0-9_-]+)$'
 
 lists = [
     {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0'},
