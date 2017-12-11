@@ -35,14 +35,42 @@ import dns.name
 from dns.exception import DNSException
 import subprocess
 
+config = {
+    'req_timeout_s': 10
+}
+
+regex_wildcard_domain = '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z0-9_-]+)$'
+regex_localhost_domain = '^127\\.0\\.0\\.1[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z0-9_-]+)$'
+regex_no_comment = '^#.*|^$'
+
 lists = [
-    {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0'},
-    {'url': 'http://mirror1.malwaredomains.com/files/justdomains'},
-    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
-    {'url': 'https://adaway.org/hosts.txt', 'regex': '^127\\.0\\.0\\.1 (?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
-    {'url': 'https://hosts-file.net/ad_servers.txt', 'regex': '^127\\.0\\.0\\.1\\s+(?P<domain>([a-z0-9\\-]+\\.)+[a-z]+)$'},
-    {'url': 'http://someonewhocares.org/hosts/zero/hosts', 'regex': '^0\\.0\\.0\\.0\\s+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z]+)$'},
-    {'url': 'https://www.malwaredomainlist.com/hostslist/hosts.txt', 'regex': '^127\\.0\\.0\\.1\\s+(?P<domain>([a-z0-9\\-]+\\.)+[a-z]+)$'}
+    {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0', 'filter': regex_no_comment},
+    {'url': 'http://mirror1.malwaredomains.com/files/justdomains', 'filter': regex_no_comment},
+    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': regex_wildcard_domain, 'filter': regex_no_comment},
+    {'url': 'https://adaway.org/hosts.txt', 'regex': regex_localhost_domain, 'filter': regex_no_comment},
+    {'url': 'https://hosts-file.net/ad_servers.txt', 'regex': regex_localhost_domain, 'filter': regex_no_comment},
+    {'url': 'http://someonewhocares.org/hosts/zero/hosts', 'regex': regex_wildcard_domain, 'filter': regex_no_comment},
+    {'url': 'https://www.malwaredomainlist.com/hostslist/hosts.txt', 'regex': regex_localhost_domain, 'filter': regex_no_comment},
+
+    #
+    # adlists from pi-hole: https://github.com/pi-hole/pi-hole/blob/master/adlists.default
+    #
+    # The below list amalgamates several lists we used previously.
+    # See `https://github.com/StevenBlack/hosts` for details
+    # StevenBlack's list
+    {'url': 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts', 'regex': regex_wildcard_domain, 'filter': regex_no_comment},
+
+    # Cameleon
+    {'url': 'http://sysctl.org/cameleon/hosts', 'regex': regex_localhost_domain, 'filter': regex_no_comment},
+
+    # Zeustracker
+    {'url': 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist', 'filter': regex_no_comment},
+
+    # Disconnect.me Tracking
+    {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt', 'filter': regex_no_comment},
+
+    # Disconnect.me Ads
+    {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt', 'filter': regex_no_comment},
 ]
 
 def download_list(url):
@@ -61,7 +89,7 @@ def download_list(url):
                 }
 
     try:
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=config['req_timeout_s'])
 
         if r.status_code == 200:
             with cache.open('w') as f:
@@ -105,6 +133,11 @@ def parse_lists(origin):
 
             for line in data.splitlines():
                 domain = ''
+
+                if 'filter' in l:
+                    m = re.match(l['filter'], line)
+                    if m:
+                        continue
 
                 if 'regex' in l:
                     m = re.match(l['regex'], line)
