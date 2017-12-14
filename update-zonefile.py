@@ -37,7 +37,10 @@ import subprocess
 import textwrap
 
 config = {
-    'req_timeout_s': 10
+    # Blocklist download request timeout
+    'req_timeout_s': 10,
+    # Also block *.domain.tld
+    'wildcard_block': False
 }
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
@@ -218,6 +221,7 @@ zone.to_file(zonefile)
 with Path(zonefile).open('a') as f:
     for d in (sorted(domains)):
         f.write(d + ' IN CNAME .\n')
-        f.write('*.' + d + ' IN CNAME .\n')
+        if config['wildcard_block']:
+            f.write('*.' + d + ' IN CNAME .\n')
 
 reload_zone(origin)
