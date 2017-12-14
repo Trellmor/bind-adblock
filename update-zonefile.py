@@ -34,6 +34,7 @@ import dns.zone
 import dns.name
 from dns.exception import DNSException
 import subprocess
+import textwrap
 
 config = {
     'req_timeout_s': 10
@@ -156,11 +157,35 @@ def parse_lists(origin):
 
 def load_zone(zonefile, origin):
     zone_text = ''
-    with Path(zonefile).open('r') as f:
+    path = Path(zonefile)
+
+    if not path.exists():
+        with path.open('w') as f:
+            f.write('@ 3600 IN SOA @ admin.{}. 0 86400 7200 2592000 86400\n@ 3600 IN NS LOCALHOST.'.format(origin))
+
+        print(textwrap.dedent('''\
+                Zone file "{0}" created.
+
+                Add BIND options entry:
+                response-policy {{
+                    zone "{1}"
+                }};
+
+                Add BIND zone entry:
+                zone "{1}" {{
+                    type master;
+                    file "{0}";
+                    allow-query {{ none; }};
+                }};
+        ''').format(path.resolve(), origin))
+
+
+    with path.open('r') as f:
         for line in f:
             if "CNAME" in line:
                 break
             zone_text += line
+
     return dns.zone.from_text(zone_text, origin)
 
 def update_serial(zone):

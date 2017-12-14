@@ -48,6 +48,7 @@ Add your rpz zone. Replace example.com with a domain of your choice.
 zone "rpz.example.com" {
 	type master;
 	file "/etc/bind/db.rpz.example.com";
+	allow-query { none; };
 };
 ```
 
