@@ -1,0 +1,12 @@
+# Blocklist download request timeout
+req_timeout_s: 10
+
+# Also block *.domain.tld
+wildcard_block: False
+
+# Don't block domains listed here
+domain_whitelist:
+  # For users who can't distinguish between google ads and normal hits
+  - 'googleadservices.com'
+  - 'www.googleadservices.com'
+  - 'pagead.l.doubleclick.net'

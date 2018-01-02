@@ -35,13 +35,11 @@ import dns.name
 from dns.exception import DNSException
 import subprocess
 import textwrap
+import yaml
 
-config = {
-    # Blocklist download request timeout
-    'req_timeout_s': 10,
-    # Also block *.domain.tld
-    'wildcard_block': False
-}
+parent_dir = os.path.dirname(os.path.realpath(__file__))
+main_conf_file = os.path.join(parent_dir, 'config.yml')
+config = yaml.safe_load(open(main_conf_file))
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
 regex_no_comment = '^#.*|^$'
@@ -220,6 +218,8 @@ zone.to_file(zonefile)
 
 with Path(zonefile).open('a') as f:
     for d in (sorted(domains)):
+        if d in config['domain_whitelist']:
+            continue
         f.write(d + ' IN CNAME .\n')
         if config['wildcard_block']:
             f.write('*.' + d + ' IN CNAME .\n')

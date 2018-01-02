@@ -27,6 +27,7 @@ Uses the following sources:
 
 * [requests](https://pypi.python.org/pypi/requests)
 * [dnspython](https://pypi.python.org/pypi/dnspython)
+* [PyYAML](https://pypi.python.org/pypi/PyYAML/)
 
 These packages need to be installed to run the update script.
 
