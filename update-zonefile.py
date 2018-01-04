@@ -111,7 +111,7 @@ def download_list(url):
             return f.read()
 
 def check_domain(domain, origin):
-    if domain == '':
+    if domain == '' or len(domain)>250:
         return False
 
     try:
