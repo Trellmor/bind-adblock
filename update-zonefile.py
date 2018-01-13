@@ -35,12 +35,15 @@ import dns.name
 from dns.exception import DNSException
 import subprocess
 import textwrap
+import shutil
 
 config = {
     # Blocklist download request timeout
     'req_timeout_s': 10,
     # Also block *.domain.tld
-    'wildcard_block': False
+    'wildcard_block': True,
+    # Cache directory
+    'cache': Path('.cache', 'bind_adblock')
 }
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
@@ -79,10 +82,7 @@ lists = [
 def download_list(url):
     headers = None
 
-    cache = Path('.cache', 'bind_adblock')
-    if not cache.is_dir():
-        cache.mkdir(parents=True)
-    cache = Path(cache, hashlib.sha1(url.encode()).hexdigest())
+    cache = Path(config['cache'], hashlib.sha1(url.encode()).hexdigest())
 
     if cache.is_file():
         last_modified = datetime.utcfromtimestamp(cache.stat().st_mtime)
@@ -195,6 +195,11 @@ def update_serial(zone):
     soa = zone.get_rdataset('@', dns.rdatatype.SOA)[0]
     soa.serial += 1
 
+def check_zone(origin, zonefile):
+    cmd = ['named-checkzone', '-q', origin, str(zonefile)]
+    r = subprocess.call(cmd)
+    return r == 0
+
 def reload_zone(origin):
     cmd = ['rndc', 'reload', origin]
     r = subprocess.call(cmd)
@@ -214,14 +219,22 @@ origin = sys.argv[2]
 zone = load_zone(zonefile, origin)
 update_serial(zone)
 
+if not config['cache'].is_dir():
+    config['cache'].mkdir(parents=True)
+
 domains = parse_lists(origin)
 
-zone.to_file(zonefile)
+tmpzonefile = Path(config['cache'], 'tempzone')
+zone.to_file(str(tmpzonefile))
 
-with Path(zonefile).open('a') as f:
+with tmpzonefile.open('a') as f:
     for d in (sorted(domains)):
         f.write(d + ' IN CNAME .\n')
         if config['wildcard_block']:
             f.write('*.' + d + ' IN CNAME .\n')
 
-reload_zone(origin)
+if check_zone(origin, tmpzonefile):
+    shutil.move(str(tmpzonefile), str(zonefile))
+    reload_zone(origin)
+else:
+    print('Zone file invalid, not loading')
