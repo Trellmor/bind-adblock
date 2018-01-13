@@ -69,3 +69,6 @@ Example: `update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com`
 
 `update-zonefile.py` will update the zone file with the fetched adserver lists and issue a `rndc reload origin` afterwards.
 
+## Whitelist
+
+An additional zone can be used to whitelist domains. See [Whitelist](https://github.com/Trellmor/bind-adblock/wiki/whitelist)
