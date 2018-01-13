@@ -114,6 +114,9 @@ def check_domain(domain, origin):
     if domain == '':
         return False
 
+    if config['wildcard_block']:
+        domain = '*.' + domain
+
     try:
         name = dns.name.from_text(domain, origin)
     except DNSException as e:
