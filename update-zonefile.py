@@ -77,6 +77,10 @@ lists = [
 
     # Disconnect.me Ads
     {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt', 'filter': regex_no_comment},
+
+    # Suspicious Domains - SANS ISC
+    {'url': 'https://isc.sans.edu/feeds/suspiciousdomains_Low.txt', 'filter': regex_no_comment},
+
 ]
 
 def download_list(url):

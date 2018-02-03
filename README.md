@@ -20,6 +20,7 @@ Uses the following sources:
 * [ZeuS domain blocklist (Standard)](https://zeustracker.abuse.ch/blocklist.php)
 * [Disconnect.me Basic tracking list](https://disconnect.me/trackerprotection)
 * [Disconnect.me Ad Filter list](https://disconnect.me/trackerprotection)
+* [SANS ISC - Suspicious Domains Low Sensitivity](https://isc.sans.edu/suspicious_domains.html#lists)
 
 ## Setup
 
