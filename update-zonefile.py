@@ -41,7 +41,7 @@ config = {
     # Blocklist download request timeout
     'req_timeout_s': 10,
     # Also block *.domain.tld
-    'wildcard_block': True,
+    'wildcard_block': False,
     # Cache directory
     'cache': Path('.cache', 'bind_adblock')
 }
