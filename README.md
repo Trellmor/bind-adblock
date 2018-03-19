@@ -14,7 +14,7 @@ Uses the following sources:
 * [Adaway default blocklist](https://adaway.org/hosts.txt)
 * [hpHosts Ad and Tracking servers only](https://hosts-file.net/)
 * [Dan Pollock’s hosts file](http://someonewhocares.org/hosts/zero/)
-* [MalwareDomainList.com Hosts List](https://www.malwaredomainlist.com/hostslist/hosts.txt)
+* [MalwareDomainList.com Hosts List](http://www.malwaredomainlist.com/hostslist/hosts.txt)
 * [StevenBlack Unified hosts file](https://github.com/StevenBlack/hosts)
 * [CAMELEON](http://sysctl.org/cameleon/)
 * [ZeuS domain blocklist (Standard)](https://zeustracker.abuse.ch/blocklist.php)
