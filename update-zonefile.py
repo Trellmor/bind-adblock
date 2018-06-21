@@ -99,9 +99,8 @@ def download_list(url):
         r = requests.get(url, headers=headers, timeout=config['req_timeout_s'])
 
         if r.status_code == 200:
-            with cache.open('w') as f:
+            with cache.open('w', encoding='utf8') as f:
                 f.write(r.text)
-            
             if 'last-modified' in r.headers:
                 last_modified = eut.parsedate_to_datetime(r.headers['last-modified']).timestamp()
                 os.utime(str(cache), times=(last_modified, last_modified))
