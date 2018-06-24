@@ -215,6 +215,7 @@ def reload_zone(origin):
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
+    parser.add_argument('--no-bind', dest='no_bind', action='store_true', help='Don\'t try to check/reload bind zone')
     parser.add_argument('zonefile', help='Path to zone file')
     parser.add_argument('origin', help='Zone origin')
     args = parser.parse_args()
@@ -236,8 +237,11 @@ if __name__ == '__main__':
             if config['wildcard_block']:
                 f.write('*.' + d + ' IN CNAME .\n')
 
-    if check_zone(args.origin, tmpzonefile):
+    if args.no_bind:
         shutil.move(str(tmpzonefile), str(args.zonefile))
-        reload_zone(args.origin)
     else:
-        print('Zone file invalid, not loading')
+        if check_zone(args.origin, tmpzonefile):
+            shutil.move(str(tmpzonefile), str(args.zonefile))
+            reload_zone(args.origin)
+        else:
+            print('Zone file invalid, not loading')
