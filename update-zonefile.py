@@ -36,6 +36,7 @@ from dns.exception import DNSException
 import subprocess
 import textwrap
 import shutil
+from argparse import ArgumentParser
 
 config = {
     # Blocklist download request timeout
@@ -212,35 +213,31 @@ def reload_zone(origin):
     if r != 0:
         raise Exception('rndc failed with return code {}'.format(r))
 
-def usage(code=0):
-    print('Usage: update-zonefile.py zonefile origin')
-    exit(code)
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
+    parser.add_argument('zonefile', help='Path to zone file')
+    parser.add_argument('origin', help='Zone origin')
+    args = parser.parse_args()
 
-if len(sys.argv) != 3:
-    usage(1)
+    zone = load_zone(args.zonefile, args.origin)
+    update_serial(zone)
 
-zonefile = sys.argv[1]
-origin = sys.argv[2]
+    if not config['cache'].is_dir():
+        config['cache'].mkdir(parents=True)
 
-zone = load_zone(zonefile, origin)
-update_serial(zone)
+    domains = parse_lists(args.origin)
 
-if not config['cache'].is_dir():
-    config['cache'].mkdir(parents=True)
+    tmpzonefile = Path(config['cache'], 'tempzone')
+    zone.to_file(str(tmpzonefile))
 
-domains = parse_lists(origin)
+    with tmpzonefile.open('a') as f:
+        for d in (sorted(domains)):
+            f.write(d + ' IN CNAME .\n')
+            if config['wildcard_block']:
+                f.write('*.' + d + ' IN CNAME .\n')
 
-tmpzonefile = Path(config['cache'], 'tempzone')
-zone.to_file(str(tmpzonefile))
-
-with tmpzonefile.open('a') as f:
-    for d in (sorted(domains)):
-        f.write(d + ' IN CNAME .\n')
-        if config['wildcard_block']:
-            f.write('*.' + d + ' IN CNAME .\n')
-
-if check_zone(origin, tmpzonefile):
-    shutil.move(str(tmpzonefile), str(zonefile))
-    reload_zone(origin)
-else:
-    print('Zone file invalid, not loading')
+    if check_zone(args.origin, tmpzonefile):
+        shutil.move(str(tmpzonefile), str(args.zonefile))
+        reload_zone(args.origin)
+    else:
+        print('Zone file invalid, not loading')
