@@ -61,10 +61,17 @@ Create a zone file for your zone. Replace example.com with the domain you used b
 
 ## Usage
 
-    update-zonefile.py zonefile origin
+    usage: update-zonefile.py [-h] [--no-bind] zonefile origin
 
-* zonefile: Path to the zone file to update
-* origin: Zone origin to use
+    Update zone file from public DNS ad blocking lists
+
+    positional arguments:
+      zonefile    path to zone file
+      origin      zone origin
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      --no-bind   Don't try to check/reload bind zone
 
 Example: `update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com`
 

@@ -216,8 +216,8 @@ def reload_zone(origin):
 if __name__ == '__main__':
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
     parser.add_argument('--no-bind', dest='no_bind', action='store_true', help='Don\'t try to check/reload bind zone')
-    parser.add_argument('zonefile', help='Path to zone file')
-    parser.add_argument('origin', help='Zone origin')
+    parser.add_argument('zonefile', help='path to zone file')
+    parser.add_argument('origin', help='zone origin')
     args = parser.parse_args()
 
     zone = load_zone(args.zonefile, args.origin)
