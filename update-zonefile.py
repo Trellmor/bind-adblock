@@ -70,9 +70,6 @@ lists = [
     # Cameleon
     {'url': 'http://sysctl.org/cameleon/hosts', 'regex': regex_domain, 'filter': regex_no_comment},
 
-    # Zeustracker
-    {'url': 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist', 'filter': regex_no_comment},
-
     # Disconnect.me Tracking
     {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt', 'filter': regex_no_comment},
 

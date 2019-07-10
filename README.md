@@ -17,7 +17,6 @@ Uses the following sources:
 * [MalwareDomainList.com Hosts List](http://www.malwaredomainlist.com/hostslist/hosts.txt)
 * [StevenBlack Unified hosts file](https://github.com/StevenBlack/hosts)
 * [CAMELEON](http://sysctl.org/cameleon/)
-* [ZeuS domain blocklist (Standard)](https://zeustracker.abuse.ch/blocklist.php)
 * [Disconnect.me Basic tracking list](https://disconnect.me/trackerprotection)
 * [Disconnect.me Ad Filter list](https://disconnect.me/trackerprotection)
 * [SANS ISC - Suspicious Domains Low Sensitivity](https://isc.sans.edu/suspicious_domains.html#lists)
