@@ -108,7 +108,7 @@ def download_list(url):
         print(e)
 
     if cache.is_file():
-        with cache.open() as f:
+        with cache.open('r', encoding='utf8') as f:
             return f.read()
 
 def check_domain(domain, origin):
