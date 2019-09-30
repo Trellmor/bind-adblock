@@ -125,14 +125,26 @@ def check_domain(domain, origin):
 
     return True
 
+def read_list(filename):
+    path = Path(filename)
+    if path.exists:
+        with path.open('r', encoding='utf8') as f:
+            return f.read()
+
+
 def parse_lists(origin):
     domains = set()
     origin_name = dns.name.from_text(origin)
     for l in lists:
-        data = download_list(l['url'])
-        if data:
-            print(l["url"])
+        data = None
+        if 'url' in l:
+            print(l['url'])
+            data = download_list(l['url'])
+        elif 'file' in l:
+            print(l['file'])
+            data = read_list(l['file'])
 
+        if data:
             lines = data.splitlines()
             print("\t{} lines".format(len(lines)))
 
