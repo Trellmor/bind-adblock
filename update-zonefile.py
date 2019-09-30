@@ -162,13 +162,16 @@ def parse_lists(origin):
     print("\nTotal\n\t{} domains".format(len(domains)))
     return domains
 
-def load_zone(zonefile, origin):
+def load_zone(zonefile, origin, raw):
     zone_text = ''
     path = Path(zonefile)
+    tmpPath = Path(config['cache'], 'tempzone')
 
     if not path.exists():
-        with path.open('w') as f:
+        with tmpPath.open('w') as f:
             f.write('@ 3600 IN SOA @ admin.{}. 0 86400 7200 2592000 86400\n@ 3600 IN NS LOCALHOST.'.format(origin))
+
+        save_zone(tmpPath, zonefile, origin, raw)
 
         print(textwrap.dedent('''\
                 Zone file "{0}" created.
@@ -182,9 +185,17 @@ def load_zone(zonefile, origin):
                 zone "{1}" {{
                     type master;
                     file "{0}";
+                    masterfile-format {2};
                     allow-query {{ none; }};
                 }};
-        ''').format(path.resolve(), origin))
+        ''').format(path.resolve(), origin, 'raw' if raw else 'text'))
+
+    if raw:
+        try:
+            compile_zone(zonefile, tmpPath, origin, 'raw', 'text')
+            path = tmpPath
+        except:
+            pass
 
 
     with path.open('r') as f:
@@ -210,14 +221,27 @@ def reload_zone(origin):
     if r != 0:
         raise Exception('rndc failed with return code {}'.format(r))
 
+def compile_zone(source, target, origin, fromFormat, toFormat):
+    cmd = ['named-compilezone', '-f', fromFormat, '-F', toFormat, '-o', str(target), origin, str(source)]
+    r = subprocess.call(cmd)
+    if r != 0:
+        raise Exception('named-compilezone failed with return code {}'.format(r))
+
+def save_zone(tmpzonefile, zonefile, origin, raw):
+    if raw:
+        compile_zone(tmpzonefile, zonefile, origin, 'text', 'raw')
+    else:
+        shutil.move(str(tmpzonefile), str(zonefile))
+
 if __name__ == '__main__':
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
     parser.add_argument('--no-bind', dest='no_bind', action='store_true', help='Don\'t try to check/reload bind zone')
+    parser.add_argument('--raw', dest='raw_zone', action='store_true', help='Save the zone file in raw format. Requires named-compilezone')
     parser.add_argument('zonefile', help='path to zone file')
     parser.add_argument('origin', help='zone origin')
     args = parser.parse_args()
 
-    zone = load_zone(args.zonefile, args.origin)
+    zone = load_zone(args.zonefile, args.origin, args.raw_zone)
     update_serial(zone)
 
     if not config['cache'].is_dir():
@@ -235,10 +259,10 @@ if __name__ == '__main__':
                 f.write('*.' + d + ' IN CNAME .\n')
 
     if args.no_bind:
-        shutil.move(str(tmpzonefile), str(args.zonefile))
+        save_zone(tmpzonefile, args.zonefile, args.origin, args.raw_zone)
     else:
         if check_zone(args.origin, tmpzonefile):
-            shutil.move(str(tmpzonefile), str(args.zonefile))
+            save_zone(tmpzonefile, args.zonefile, args.origin, args.raw_zone)
             reload_zone(args.origin)
         else:
             print('Zone file invalid, not loading')

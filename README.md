@@ -48,6 +48,7 @@ Add your rpz zone. Replace example.com with a domain of your choice.
 zone "rpz.example.com" {
 	type master;
 	file "/etc/bind/db.rpz.example.com";
+	masterfile-format text;
 	allow-query { none; };
 };
 ```
@@ -71,6 +72,7 @@ Create a zone file for your zone. Replace example.com with the domain you used b
     optional arguments:
       -h, --help  show this help message and exit
       --no-bind   Don't try to check/reload bind zone
+      --raw       Save the zone file in raw format. Requires named-compilezone
 
 Example: `update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com`
 
