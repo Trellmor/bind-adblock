@@ -51,6 +51,7 @@ regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[
 regex_no_comment = '^#.*|^$'
 
 lists = [
+    {'file': 'blocklist.txt', 'filter': regex_no_comment},
     {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0', 'filter': regex_no_comment},
     {'url': 'http://mirror1.malwaredomains.com/files/justdomains', 'filter': regex_no_comment},
     {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': regex_domain, 'filter': regex_no_comment},

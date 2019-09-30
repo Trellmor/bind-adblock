@@ -1,0 +1,3 @@
+# Stop Firefox from enabeling DoH. Since we are running an ad-blocking DNS 
+# Server we want to use it.
+use-application-dns.net
