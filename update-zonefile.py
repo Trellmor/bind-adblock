@@ -44,7 +44,7 @@ config = {
     # Also block *.domain.tld
     'wildcard_block': False,
     # Cache directory
-    'cache': Path('.cache', 'bind_adblock')
+    'cache': Path(os.path.dirname(os.path.realpath(__file__)), '.cache', 'bind_adblock')
 }
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
@@ -254,11 +254,13 @@ if __name__ == '__main__':
     parser.add_argument('origin', help='zone origin')
     args = parser.parse_args()
 
-    zone = load_zone(args.zonefile, args.origin, args.raw_zone)
-    update_serial(zone)
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     if not config['cache'].is_dir():
         config['cache'].mkdir(parents=True)
+
+    zone = load_zone(args.zonefile, args.origin, args.raw_zone)
+    update_serial(zone)
 
     domains = parse_lists(args.origin)
 
