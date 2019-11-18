@@ -25,10 +25,13 @@ Uses the following sources:
 
 ### Python packages
 
-* [requests](https://pypi.python.org/pypi/requests)
-* [dnspython](https://pypi.python.org/pypi/dnspython)
+See [requirements.txt](requirements.txt)
 
-These packages need to be installed to run the update script.
+To install
+```
+pip install -r requirements.txt
+```
+
 
 ### Configure BIND
 
