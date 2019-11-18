@@ -191,7 +191,7 @@ def load_zone(zonefile, origin, raw):
 
                 Add BIND options entry:
                 response-policy {{
-                    zone "{1}"
+                    zone "{1}";
                 }};
 
                 Add BIND zone entry:
