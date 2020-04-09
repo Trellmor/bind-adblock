@@ -79,6 +79,9 @@ lists = [
 
     # DShield.org Suspicious Domain List
     {'url': 'https://dshield.org/feeds/suspiciousdomains_Low.txt', 'filter': regex_no_comment},
+    
+    # Polish CERT - https://www.cert.pl/ostrzezenia_phishing/
+    {'url': 'https://hole.cert.pl/domains/domains.txt', 'filter': regex_no_comment},
 
 ]
 
