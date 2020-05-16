@@ -278,6 +278,15 @@ if __name__ == '__main__':
     else:
         if check_zone(args.origin, tmpzonefile):
             save_zone(tmpzonefile, args.zonefile, args.origin, args.raw_zone)
+            cmd = ['/usr/sbin/getenforce']
+            r = subprocess.check_output(cmd).strip()
+            print('SELinux getenforce output / Current State is: ',r)
+            if r == b'Enforcing':
+                print('SELinux restorecon being run to reset MAC security context on zone file')
+                cmd = ['/sbin/restorecon', '-F', args.zonefile]
+                r = subprocess.call(cmd)
+                if r != 0:
+                    raise Exception('Cannot run selinux restorecon on the zonefile - return code {}'.format(r))
             reload_zone(args.origin)
         else:
             print('Zone file invalid, not loading')
