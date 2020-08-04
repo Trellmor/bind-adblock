@@ -7,6 +7,9 @@ wildcard_block: False
 # Cache directory
 cache: '.cache/bind_adblock'
 
+# Can be either NULL or NXDOMAIN
+blocking_mode: 'NXDOMAIN'
+
 # Blocklists
 # List of blocklists
 # Format:

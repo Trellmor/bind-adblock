@@ -32,6 +32,7 @@ import re
 import sys
 import dns.zone
 import dns.name
+import dns.version
 from dns.exception import DNSException
 import subprocess
 import textwrap
@@ -188,16 +189,19 @@ def load_zone(zonefile, origin, raw):
 
     with path.open('r') as f:
         for line in f:
-            if "CNAME" in line:
-                break
             zone_text += line
+            if "IN NS" in line:
+                break
 
     return dns.zone.from_text(zone_text, origin)
 
 def update_serial(zone):
     soaset = zone.get_rdataset('@', dns.rdatatype.SOA)
     soa = soaset[0]
-    soaset.add(soa.replace(serial=soa.serial + 1))
+    if dns.version.MAJOR < 2:
+        soa.serial += 1
+    else:
+        soaset.add(soa.replace(serial=soa.serial + 1))
 
 def check_zone(origin, zonefile):
     cmd = ['named-checkzone', '-q', origin, str(zonefile)]
@@ -221,6 +225,13 @@ def save_zone(tmpzonefile, zonefile, origin, raw):
         compile_zone(tmpzonefile, zonefile, origin, 'text', 'raw')
     else:
         shutil.move(str(tmpzonefile), str(zonefile))
+
+def append_domain_to_zonefile(file, domain):
+    if config['blocking_mode'] == 'NXDOMAIN' or "_" in domain:
+        file.write(domain + ' IN CNAME .\n')
+    else:
+        file.write(domain + ' IN A 0.0.0.0\n')
+        file.write(domain + ' IN AAAA ::\n')
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
@@ -247,9 +258,9 @@ if __name__ == '__main__':
         for d in (sorted(domains)):        
             if d in config['domain_whitelist']:
                 continue
-            f.write(d + ' IN CNAME .\n')
+            append_domain_to_zonefile(f, d)
             if config['wildcard_block']:
-                f.write('*.' + d + ' IN CNAME .\n')
+                append_domain_to_zonefile(f, '*.' + d)
 
     if args.no_bind:
         save_zone(tmpzonefile, args.zonefile, args.origin, args.raw_zone)
