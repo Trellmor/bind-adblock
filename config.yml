@@ -1,0 +1,11 @@
+# Blocklist download request timeout
+req_timeout_s: 10
+
+# Also block *.domain.tld
+wildcard_block: False
+
+# Cache directory
+cache: '.cache/bind_adblock'
+
+# Don't block domains listed here
+domain_whitelist: []

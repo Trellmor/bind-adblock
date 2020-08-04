@@ -37,6 +37,7 @@ import subprocess
 import textwrap
 import shutil
 from argparse import ArgumentParser
+import yaml
 
 config = {
     # Blocklist download request timeout
@@ -44,8 +45,15 @@ config = {
     # Also block *.domain.tld
     'wildcard_block': False,
     # Cache directory
-    'cache': Path(os.path.dirname(os.path.realpath(__file__)), '.cache', 'bind_adblock')
+    'cache': Path(os.path.dirname(os.path.realpath(__file__)), )
 }
+
+parent_dir = os.path.dirname(os.path.realpath(__file__))
+main_conf_file = os.path.join(parent_dir, 'config.yml')
+config = yaml.safe_load(open(main_conf_file))
+config['cache'] = Path(config['cache'])
+if not config['cache'].is_absolute():
+    config['cache'] = Path(parent_dir, config['cache'])
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
 regex_no_comment = '^#.*|^$'
@@ -269,7 +277,9 @@ if __name__ == '__main__':
     zone.to_file(str(tmpzonefile))
 
     with tmpzonefile.open('a') as f:
-        for d in (sorted(domains)):
+        for d in (sorted(domains)):        
+            if d in config['domain_whitelist']:
+                continue
             f.write(d + ' IN CNAME .\n')
             if config['wildcard_block']:
                 f.write('*.' + d + ' IN CNAME .\n')
