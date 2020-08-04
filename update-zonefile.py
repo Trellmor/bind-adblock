@@ -58,38 +58,6 @@ if not config['cache'].is_absolute():
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
 regex_no_comment = '^#.*|^$'
 
-lists = [
-    {'file': 'blocklist.txt', 'filter': regex_no_comment},
-    {'url': 'https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0', 'filter': regex_no_comment},
-    {'url': 'http://mirror1.malwaredomains.com/files/justdomains', 'filter': regex_no_comment},
-    {'url': 'http://winhelp2002.mvps.org/hosts.txt', 'regex': regex_domain, 'filter': regex_no_comment},
-    {'url': 'https://adaway.org/hosts.txt', 'regex': regex_domain, 'filter': regex_no_comment},
-    {'url': 'https://hosts-file.net/ad_servers.txt', 'regex': regex_domain, 'filter': regex_no_comment},
-    {'url': 'https://www.someonewhocares.org/hosts/zero/hosts', 'regex': regex_domain, 'filter': regex_no_comment},
-    {'url': 'http://www.malwaredomainlist.com/hostslist/hosts.txt', 'regex': regex_domain, 'filter': regex_no_comment},
-
-    #
-    # adlists from pi-hole: https://github.com/pi-hole/pi-hole/blob/master/adlists.default
-    #
-    # The below list amalgamates several lists we used previously.
-    # See `https://github.com/StevenBlack/hosts` for details
-    # StevenBlack's list
-    {'url': 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts', 'regex': regex_domain, 'filter': regex_no_comment},
-
-    # Cameleon
-    {'url': 'http://sysctl.org/cameleon/hosts', 'regex': regex_domain, 'filter': regex_no_comment},
-
-    # Disconnect.me Tracking
-    {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt', 'filter': regex_no_comment},
-
-    # Disconnect.me Ads
-    {'url': 'https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt', 'filter': regex_no_comment},
-
-    # DShield.org Suspicious Domain List
-    {'url': 'https://dshield.org/feeds/suspiciousdomains_Low.txt', 'filter': regex_no_comment},
-
-]
-
 def download_list(url):
     headers = None
 
@@ -144,7 +112,7 @@ def read_list(filename):
 def parse_lists(origin):
     domains = set()
     origin_name = dns.name.from_text(origin)
-    for l in lists:
+    for l in config['lists']:
         data = None
         if 'url' in l:
             print(l['url'])
@@ -162,13 +130,12 @@ def parse_lists(origin):
             for line in data.splitlines():
                 domain = ''
 
-                if 'filter' in l:
-                    m = re.match(l['filter'], line)
-                    if m:
-                        continue
+                m = re.match(regex_no_comment, line)
+                if m:
+                    continue
 
-                if 'regex' in l:
-                    m = re.match(l['regex'], line)
+                if l.get('format', 'domain') == 'hosts':
+                    m = re.match(regex_domain, line)
                     if m:
                         domain = m.group('domain')
                 else:
