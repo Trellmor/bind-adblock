@@ -220,8 +220,9 @@ def load_zone(zonefile, origin, raw):
     return dns.zone.from_text(zone_text, origin)
 
 def update_serial(zone):
-    soa = zone.get_rdataset('@', dns.rdatatype.SOA)[0]
-    soa.serial += 1
+    soaset = zone.get_rdataset('@', dns.rdatatype.SOA)
+    soa = soaset[0]
+    soaset.add(soa.replace(serial=soa.serial + 1))
 
 def check_zone(origin, zonefile):
     cmd = ['named-checkzone', '-q', origin, str(zonefile)]
