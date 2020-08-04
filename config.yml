@@ -50,5 +50,8 @@ lists:
   # DShield.org Suspicious Domain List
   - url: 'https://dshield.org/feeds/suspiciousdomains_Low.txt'
 
+  # Polish CERT - https://www.cert.pl/ostrzezenia_phishing/
+  - url: 'https://hole.cert.pl/domains/domains.txt'
+
 # Don't block domains listed here
 domain_whitelist: []
