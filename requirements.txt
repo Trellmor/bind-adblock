@@ -3,5 +3,6 @@ chardet==3.0.4
 dnspython==2.0.0
 idna==2.10
 pathlib==1.0.1
+PyYAML==5.3.1
 requests==2.24.0
 urllib3==1.25.10

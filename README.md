@@ -83,4 +83,5 @@ Example: `update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com`
 
 ## Whitelist
 
-An additional zone can be used to whitelist domains. See [Whitelist](https://github.com/Trellmor/bind-adblock/wiki/whitelist)
+You can either use an additional zone to whitelist domains (Or add them to `config.yml`) 
+See [Whitelist](https://github.com/Trellmor/bind-adblock/wiki/whitelist) for adding a whitelist zone.

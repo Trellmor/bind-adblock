@@ -9,6 +9,7 @@ verify_ssl = true
 requests = "*"
 pathlib = "*"
 dnspython = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"
