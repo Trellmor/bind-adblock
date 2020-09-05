@@ -250,6 +250,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
     parser.add_argument('--no-bind', dest='no_bind', action='store_true', help='Don\'t try to check/reload bind zone')
     parser.add_argument('--raw', dest='raw_zone', action='store_true', help='Save the zone file in raw format. Requires named-compilezone')
+    parser.add_argument('--empty', dest='empty', action='store_true', help='Create header-only (empty) rpz zone file')
     parser.add_argument('zonefile', help='path to zone file')
     parser.add_argument('origin', help='zone origin')
     args = parser.parse_args()
@@ -262,7 +263,10 @@ if __name__ == '__main__':
     zone = load_zone(args.zonefile, args.origin, args.raw_zone)
     update_serial(zone)
 
-    domains = parse_lists(args.origin)
+    if args.empty:
+        domains = set()
+    else:
+        domains = parse_lists(args.origin)
 
     tmpzonefile = Path(config['cache'], 'tempzone')
     zone.to_file(str(tmpzonefile))
