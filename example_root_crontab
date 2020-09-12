@@ -1,0 +1,20 @@
+# This is an example crontab file, which assumes the user (e.g. root) 
+# has no crontab file yet, at all.  You may want to do:
+# 'crontab -l' to validate that assumption...
+# if valid, feel free to edit values below, and then run 
+#     'crontab example_crontab_file'
+# if invalid, you'll need to merge at least the last line into your
+# current crontab file
+#
+# use /bin/bash to run commands, no matter what /etc/passwd says
+SHELL=/bin/bash
+# mail any output to user `nick', no matter whose crontab this is
+# nick is an example username...replace with your prefered recipient
+MAILTO=nick
+CRON_TZ=EST5EDT
+PATH=/usr/share/Modules/bin:/usr/lib64/ccache:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+# run five minutes after 2am, every day
+# assumes your rpz domain file is /etc/bin/db.rpz.example.com and 
+# your rpz domain is named rpz.example.com in your BIND config
+5 2 * * * (cd /path/to/bind-adblock/bind-adblock-master; python3 ./update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com) 2>&1
+

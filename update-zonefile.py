@@ -214,6 +214,9 @@ def reload_zone(origin):
     if r != 0:
         raise Exception('rndc failed with return code {}'.format(r))
 
+def is_exe(fpath):
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
 def compile_zone(source, target, origin, fromFormat, toFormat):
     cmd = ['named-compilezone', '-f', fromFormat, '-F', toFormat, '-o', str(target), origin, str(source)]
     r = subprocess.call(cmd)
@@ -237,6 +240,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
     parser.add_argument('--no-bind', dest='no_bind', action='store_true', help='Don\'t try to check/reload bind zone')
     parser.add_argument('--raw', dest='raw_zone', action='store_true', help='Save the zone file in raw format. Requires named-compilezone')
+    parser.add_argument('--empty', dest='empty', action='store_true', help='Create header-only (empty) rpz zone file')
     parser.add_argument('zonefile', help='path to zone file')
     parser.add_argument('origin', help='zone origin')
     args = parser.parse_args()
@@ -249,7 +253,10 @@ if __name__ == '__main__':
     zone = load_zone(args.zonefile, args.origin, args.raw_zone)
     update_serial(zone)
 
-    domains = parse_lists(args.origin)
+    if args.empty:
+        domains = set()
+    else:
+        domains = parse_lists(args.origin)
 
     tmpzonefile = Path(config['cache'], 'tempzone')
     zone.to_file(str(tmpzonefile))
@@ -267,6 +274,17 @@ if __name__ == '__main__':
     else:
         if check_zone(args.origin, tmpzonefile):
             save_zone(tmpzonefile, args.zonefile, args.origin, args.raw_zone)
+            if is_exe('/usr/sbin/getenforce'):
+                cmd = ['/usr/sbin/getenforce']
+                r = subprocess.check_output(cmd).strip()
+                print('SELinux getenforce output / Current State is: ',r)
+                if r == b'Enforcing':
+                    print('SELinux restorecon being run to reset MAC security context on zone file')
+                    if is_exe('/sbin/restorecon'):
+                        cmd = ['/sbin/restorecon', '-F', args.zonefile]
+                        r = subprocess.call(cmd)
+                        if r != 0:
+                            raise Exception('Cannot run selinux restorecon on the zonefile - return code {}'.format(r))
             reload_zone(args.origin)
         else:
             print('Zone file invalid, not loading')
