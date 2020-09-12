@@ -64,7 +64,7 @@ Create a zone file for your zone. Replace example.com with the domain you used b
 
 ## Usage
 
-    usage: update-zonefile.py [-h] [--no-bind] zonefile origin
+    usage: update-zonefile.py [-h] [--no-bind] [--raw] [--empty] zonefile origin
 
     Update zone file from public DNS ad blocking lists
 
@@ -76,6 +76,7 @@ Create a zone file for your zone. Replace example.com with the domain you used b
       -h, --help  show this help message and exit
       --no-bind   Don't try to check/reload bind zone
       --raw       Save the zone file in raw format. Requires named-compilezone
+      --empty     Create header-only (empty) rpz zone file
 
 Example: `update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com`
 
