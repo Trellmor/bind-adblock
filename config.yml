@@ -47,9 +47,6 @@ lists:
   # Disconnect.me Ads
   - url: 'https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt'
 
-  # DShield.org Suspicious Domain List
-  - url: 'https://dshield.org/feeds/suspiciousdomains_Low.txt'
-
   # Polish CERT - https://www.cert.pl/ostrzezenia_phishing/
   - url: 'https://hole.cert.pl/domains/domains.txt'
 

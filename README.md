@@ -12,14 +12,13 @@ Uses the following sources:
 * [Malware domains](http://www.malwaredomains.com/)
 * [MVPS HOSTS](http://winhelp2002.mvps.org/)
 * [Adaway default blocklist](https://adaway.org/hosts.txt)
-* [hpHosts Ad and Tracking servers only](https://hosts-file.net/)
 * [Dan Pollock’s hosts file](http://someonewhocares.org/hosts/zero/)
 * [MalwareDomainList.com Hosts List](http://www.malwaredomainlist.com/hostslist/hosts.txt)
 * [StevenBlack Unified hosts file](https://github.com/StevenBlack/hosts)
 * [CAMELEON](http://sysctl.org/cameleon/)
 * [Disconnect.me Basic tracking list](https://disconnect.me/trackerprotection)
 * [Disconnect.me Ad Filter list](https://disconnect.me/trackerprotection)
-* [SANS ISC - Suspicious Domains Low Sensitivity](https://isc.sans.edu/suspicious_domains.html#lists)
+* [Polish CERT Phishing list](https://www.cert.pl/ostrzezenia_phishing/)
 
 ## Setup
 
