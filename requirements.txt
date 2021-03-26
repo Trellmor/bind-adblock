@@ -1,8 +1,9 @@
-certifi==2020.6.20
+-i https://pypi.org/simple/
+certifi==2020.12.5
 chardet==3.0.4
 dnspython==2.0.0
 idna==2.10
 pathlib==1.0.1
-PyYAML==5.3.1
+pyyaml==5.4
 requests==2.24.0
-urllib3==1.25.10
+urllib3==1.25.11
