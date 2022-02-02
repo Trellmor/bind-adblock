@@ -209,7 +209,7 @@ def check_zone(origin, zonefile):
     return r == 0
 
 def reload_zone(origin):
-    cmd = ['rndc', 'reload', origin]
+    cmd = ['rndc', 'reload']
     r = subprocess.call(cmd)
     if r != 0:
         raise Exception('rndc failed with return code {}'.format(r))
