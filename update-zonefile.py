@@ -207,7 +207,7 @@ def check_zone(origin, zonefile):
     cmd = ['/usr/sbin/named-checkzone', '-q', origin, str(zonefile)]
     result = subprocess.run(cmd, capture_output=True)
     if result.returncode != 0:
-        print(f"Error {result.returncode}. Output: {result.stdout}. Error: {result.stderr}")
+        print(f"Error {result.returncode}. Command: '{' '.join(cmd)}'. Output: {result.stdout}. Error: {result.stderr}")
     return result.returncode == 0
 
 def reload_zone(origin):
