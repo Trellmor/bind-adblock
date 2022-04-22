@@ -264,7 +264,7 @@ if __name__ == '__main__':
     zone.to_file(str(tmpzonefile))
 
     with tmpzonefile.open('a') as f:
-        for d in (sorted(domains)):        
+        for d in (sorted(domains)):
             if d in config['domain_whitelist']:
                 continue
             append_domain_to_zonefile(f, d)
