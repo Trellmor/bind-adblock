@@ -204,7 +204,7 @@ def update_serial(zone):
         soaset.add(soa.replace(serial=soa.serial + 1))
 
 def check_zone(origin, zonefile):
-    cmd = ['/usr/sbin/named-checkzone', '-q', origin, str(zonefile)]
+    cmd = ['/usr/sbin/named-checkzone', origin, str(zonefile)]
     result = subprocess.run(cmd, capture_output=True)
     if result.returncode != 0:
         print(f"Error {result.returncode}. Command: '{' '.join(cmd)}'. Output: {result.stdout}. Error: {result.stderr}")
