@@ -206,7 +206,8 @@ def update_serial(zone):
 def check_zone(origin, zonefile):
     cmd = ['/usr/sbin/named-checkzone', '-q', origin, str(zonefile)]
     result = subprocess.run(cmd, capture_output=True)
-    if result.stderr != "":
+    if result.returncode != 0:
+        print(result.stdout)
         print(result.stderr)
     return result.returncode == 0
 
