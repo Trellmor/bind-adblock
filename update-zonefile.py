@@ -29,7 +29,6 @@ import email.utils as eut
 import os
 import hashlib
 import re
-import sys
 import dns.zone
 import dns.name
 import dns.version
@@ -59,6 +58,7 @@ if not config['cache'].is_absolute():
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
 regex_no_comment = '^#.*|^$'
 
+
 def download_list(url):
     headers = None
 
@@ -67,9 +67,9 @@ def download_list(url):
     if cache.is_file():
         last_modified = datetime.utcfromtimestamp(cache.stat().st_mtime)
         headers = {
-                'If-modified-since': eut.format_datetime(last_modified),
-                'User-Agent': 'Bind adblock zonfile updater v1.0 (https://github.com/Trellmor/bind-adblock)'
-                }
+            'If-modified-since': eut.format_datetime(last_modified),
+            'User-Agent': 'Bind adblock zonfile updater v1.0 \
+(https://github.com/Trellmor/bind-adblock)'}
 
     try:
         r = requests.get(url, headers=headers, timeout=config['req_timeout_s'])
@@ -89,6 +89,7 @@ def download_list(url):
         with cache.open('r', encoding='utf8') as f:
             return f.read()
 
+
 def check_domain(domain, origin):
     if domain == '':
         return False
@@ -97,11 +98,12 @@ def check_domain(domain, origin):
         domain = '*.' + domain
 
     try:
-        name = dns.name.from_text(domain, origin)
-    except DNSException as e:
+        dns.name.from_text(domain, origin)
+    except DNSException:
         return False
 
     return True
+
 
 def read_list(filename):
     path = Path(filename)
@@ -113,14 +115,14 @@ def read_list(filename):
 def parse_lists(origin):
     domains = set()
     origin_name = dns.name.from_text(origin)
-    for l in config['lists']:
+    for item in config['lists']:
         data = None
-        if 'url' in l:
-            print(l['url'])
-            data = download_list(l['url'])
-        elif 'file' in l:
-            print(l['file'])
-            data = read_list(l['file'])
+        if 'url' in item:
+            print(item['url'])
+            data = download_list(item['url'])
+        elif 'file' in item:
+            print(item['file'])
+            data = read_list(item['file'])
 
         if data:
             lines = data.splitlines()
@@ -135,7 +137,7 @@ def parse_lists(origin):
                 if m:
                     continue
 
-                if l.get('format', 'domain') == 'hosts':
+                if item.get('format', 'domain') == 'hosts':
                     m = re.match(regex_domain, line)
                     if m:
                         domain = m.group('domain')
@@ -151,6 +153,7 @@ def parse_lists(origin):
     print("\nTotal\n\t{} domains".format(len(domains)))
     return domains
 
+
 def load_zone(zonefile, origin, raw):
     zone_text = ''
     path = Path(zonefile)
@@ -158,7 +161,8 @@ def load_zone(zonefile, origin, raw):
 
     if not path.exists():
         with tmpPath.open('w') as f:
-            f.write('@ 3600 IN SOA @ admin.{}. 0 86400 7200 2592000 86400\n@ 3600 IN NS LOCALHOST.'.format(origin))
+            f.write(f"@ 3600 IN SOA @ admin.{origin}. 0 86400 7200 2592000 86400\n@ 3600 IN NS \
+LOCALHOST.")
 
         save_zone(tmpPath, zonefile, origin, raw)
 
@@ -183,9 +187,8 @@ def load_zone(zonefile, origin, raw):
         try:
             compile_zone(zonefile, tmpPath, origin, 'raw', 'text')
             path = tmpPath
-        except:
+        except Exception:
             pass
-
 
     with path.open('r') as f:
         for line in f:
@@ -195,6 +198,7 @@ def load_zone(zonefile, origin, raw):
 
     return dns.zone.from_text(zone_text, origin)
 
+
 def update_serial(zone):
     soaset = zone.get_rdataset('@', dns.rdatatype.SOA)
     soa = soaset[0]
@@ -203,33 +207,50 @@ def update_serial(zone):
     else:
         soaset.add(soa.replace(serial=soa.serial + 1))
 
+
 def check_zone(origin, zonefile):
     cmd = ['/usr/sbin/named-checkzone', origin, str(zonefile)]
     result = subprocess.run(cmd, capture_output=True)
     if result.returncode != 0:
-        print(f"Error {result.returncode}. Command: '{' '.join(cmd)}'. Output: {result.stdout}. Error: {result.stderr}")
+        print(f"Error {result.returncode}. Command: '{' '.join(cmd)}'. \
+Output: {result.stdout}. Errors: {result.stderr}")
     return result.returncode == 0
 
+
 def reload_zone(origin):
-    cmd = ['rndc', 'reload']
-    r = subprocess.call(cmd)
-    if r != 0:
-        raise Exception('rndc failed with return code {}'.format(r))
+    cmd = ['/usr/sbin/rndc', 'reload']
+    result = subprocess.run(cmd, capture_output=True)
+    if result.returncode != 0:
+        raise Exception(f"rndc failed with return code {result.returncode}. \
+Output: {result.stdout}. Errors: {result.stderr}")
+
 
 def is_exe(fpath):
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
+
 def compile_zone(source, target, origin, fromFormat, toFormat):
-    cmd = ['named-compilezone', '-f', fromFormat, '-F', toFormat, '-o', str(target), origin, str(source)]
+    cmd = [
+        '/usr/sbin/named-compilezone',
+        '-f',
+        fromFormat,
+        '-F',
+        toFormat,
+        '-o',
+        str(target),
+        origin,
+        str(source)]
     r = subprocess.call(cmd)
     if r != 0:
         raise Exception('named-compilezone failed with return code {}'.format(r))
+
 
 def save_zone(tmpzonefile, zonefile, origin, raw):
     if raw:
         compile_zone(tmpzonefile, zonefile, origin, 'text', 'raw')
     else:
         shutil.move(str(tmpzonefile), str(zonefile))
+
 
 def append_domain_to_zonefile(file, domain):
     if config['blocking_mode'] == 'NXDOMAIN' or "_" in domain:
@@ -238,14 +259,23 @@ def append_domain_to_zonefile(file, domain):
         file.write(domain + ' IN A 0.0.0.0\n')
         file.write(domain + ' IN AAAA ::\n')
 
-if __name__ == '__main__':
+
+def parse_arguments():
     parser = ArgumentParser(description='Update zone file from public DNS ad blocking lists')
-    parser.add_argument('--no-bind', dest='no_bind', action='store_true', help='Don\'t try to check/reload bind zone')
-    parser.add_argument('--raw', dest='raw_zone', action='store_true', help='Save the zone file in raw format. Requires named-compilezone')
-    parser.add_argument('--empty', dest='empty', action='store_true', help='Create header-only (empty) rpz zone file')
+    parser.add_argument('--no-bind', dest='no_bind', action='store_true',
+                        help='Don\'t try to check/reload bind zone')
+    parser.add_argument('--raw', dest='raw_zone', action='store_true',
+                        help='Save the zone file in raw format. Requires named-compilezone')
+    parser.add_argument('--empty', dest='empty', action='store_true',
+                        help='Create header-only (empty) rpz zone file')
     parser.add_argument('zonefile', help='path to zone file')
     parser.add_argument('origin', help='zone origin')
     args = parser.parse_args()
+    return args
+
+
+if __name__ == '__main__':
+    args = parse_arguments()
 
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
@@ -279,14 +309,15 @@ if __name__ == '__main__':
             if is_exe('/usr/sbin/getenforce'):
                 cmd = ['/usr/sbin/getenforce']
                 r = subprocess.check_output(cmd).strip()
-                print('SELinux getenforce output / Current State is: ',r)
+                print('SELinux getenforce output / Current State is: ', r)
                 if r == b'Enforcing':
                     print('SELinux restorecon being run to reset MAC security context on zone file')
                     if is_exe('/sbin/restorecon'):
                         cmd = ['/sbin/restorecon', '-F', args.zonefile]
                         r = subprocess.call(cmd)
                         if r != 0:
-                            raise Exception('Cannot run selinux restorecon on the zonefile - return code {}'.format(r))
+                            raise Exception('Cannot run selinux restorecon on the zonefile - \
+return code {}'.format(r))
             reload_zone(args.origin)
         else:
             print('Zone file invalid, not loading')
