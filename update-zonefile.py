@@ -39,6 +39,7 @@ import textwrap
 import shutil
 from argparse import ArgumentParser
 import yaml
+import validators
 
 config = {
     # Blocklist download request timeout
@@ -99,6 +100,10 @@ def check_domain(domain, origin):
     try:
         name = dns.name.from_text(domain, origin)
     except DNSException as e:
+        return False
+
+    if not validators.domain(domain):
+        print('Ignoring invalid domain {}'.format(domain))
         return False
 
     return True
