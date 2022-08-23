@@ -59,6 +59,7 @@ if not config['cache'].is_absolute():
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
 regex_no_comment = '^#.*|^$'
+regex_no_comment_in_line = '^([^#]+)'
 
 def download_list(url):
     headers = None
@@ -136,8 +137,14 @@ def parse_lists(origin):
             for line in data.splitlines():
                 domain = ''
 
-                m = re.match(regex_no_comment, line)
+                if re.match(regex_no_comment, line):
+                    continue
+
+                m = re.search(regex_no_comment_in_line, line)
                 if m:
+                    line = m.group(1).strip()
+
+                if line == '':
                     continue
 
                 if l.get('format', 'domain') == 'hosts':
