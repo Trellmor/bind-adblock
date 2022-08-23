@@ -26,8 +26,6 @@ lists:
     format: hosts
   - url: 'https://www.someonewhocares.org/hosts/zero/hosts'
     format: hosts
-  - url: 'http://www.malwaredomainlist.com/hostslist/hosts.txt'
-    format: hosts
 
   # adlists from pi-hole: https://github.com/pi-hole/pi-hole/blob/master/adlists.default
   #
