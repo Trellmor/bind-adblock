@@ -38,6 +38,7 @@ import textwrap
 import shutil
 from argparse import ArgumentParser
 import yaml
+import validators
 
 config = {
     # Blocklist download request timeout
@@ -57,6 +58,7 @@ if not config['cache'].is_absolute():
 
 regex_domain = '^(127|0)\\.0\\.0\\.(0|1)[\\s\\t]+(?P<domain>([a-z0-9\\-_]+\\.)+[a-z][a-z0-9_-]*)$'
 regex_no_comment = '^#.*|^$'
+regex_no_comment_in_line = '^([^#]+)'
 
 
 def download_list(url):
@@ -102,6 +104,10 @@ def check_domain(domain, origin):
     except DNSException:
         return False
 
+    if not validators.domain(domain):
+        print('Ignoring invalid domain {}'.format(domain))
+        return False
+
     return True
 
 
@@ -133,8 +139,14 @@ def parse_lists(origin):
             for line in data.splitlines():
                 domain = ''
 
-                m = re.match(regex_no_comment, line)
+                if re.match(regex_no_comment, line):
+                    continue
+
+                m = re.search(regex_no_comment_in_line, line)
                 if m:
+                    line = m.group(1).strip()
+
+                if line == '':
                     continue
 
                 if item.get('format', 'domain') == 'hosts':

@@ -9,7 +9,6 @@ Requires BIND 9.8 or newer for [RPZ](https://en.wikipedia.org/wiki/Response_poli
 Uses the following sources:
 
 * [Peter Lowe’s Ad and tracking server list](https://pgl.yoyo.org/adservers/)
-* [Malware domains](http://www.malwaredomains.com/)
 * [MVPS HOSTS](http://winhelp2002.mvps.org/)
 * [Adaway default blocklist](https://adaway.org/hosts.txt)
 * [Dan Pollock’s hosts file](http://someonewhocares.org/hosts/zero/)
