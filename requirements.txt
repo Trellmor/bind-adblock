@@ -4,7 +4,9 @@ decorator==5.1.1
 dnspython==2.2.1
 idna==3.3
 pathlib==1.0.1
-PyYAML==6.0
-requests==2.28.1
+#PyYAML==6.0
+PyYAML
+#requests==2.28.1
+requests
 urllib3==1.26.12
 validators==0.20.0
