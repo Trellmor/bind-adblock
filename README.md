@@ -78,10 +78,28 @@ Create a zone file for your zone. Replace example.com with the domain you used b
       --no-bind   Don't try to check/reload bind zone
       --raw       Save the zone file in raw format. Requires named-compilezone
       --empty     Create header-only (empty) rpz zone file
+      --views     If using multiple BIND views, list where each zone is defined
 
 Example: `update-zonefile.py /etc/bind/db.rpz.example.com rpz.example.com`
 
 `update-zonefile.py` will update the zone file with the fetched adserver lists and issue a `rndc reload origin` afterwards.
+
+### Multiple BIND Views
+
+If you defined the  adblock rpz across multiple BIND views, then you will need to pass --views a space separated list of which views the zone is defined.
+
+Doing so will issue 'rndc reload origin IN view' for each view provided for the origin zone.
+
+```shell
+--views "internal dmz test"
+```
+
+This argument can be omitted if the origin zone only occurs once in your configuration.
+The following error is an indication you are using the rpz zone multiple views.
+
+```text
+zone 'rpz.adblocker' was found in multiple views
+```
 
 ## Whitelist
 
