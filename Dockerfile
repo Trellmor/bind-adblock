@@ -1,14 +1,19 @@
 FROM python:latest
 
-ENV SRC="."
+WORKDIR /root
 
-VOLUME /bind-adblock
+COPY blocklist.txt .
+COPY config.yml .
+COPY update-zonefile.py .
+COPY requirements.txt .
 
-COPY ${SRC}/blocklist.txt ./
-COPY ${SRC}/config.yml ./
-COPY ${SRC}/update-zonefile.py ./
-COPY ${SRC}/requirements.txt ./
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+RUN mkdir /bind-adblock
 
 CMD ["python3", "./update-zonefile.py", "--no-bind", "/bind-adblock/rpz-adblocker.zone", "rpz.adblocker"]
