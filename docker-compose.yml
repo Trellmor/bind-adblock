@@ -1,0 +1,14 @@
+---
+version: "3"
+
+services:
+  updater:
+    container_name: adblock
+    build:
+      context: .
+    volumes:
+      - 'bind9-zones:/bind-adblock'
+      # - '/var/bind:/bind-adblock'
+
+volumes:
+  bind9-zones:
