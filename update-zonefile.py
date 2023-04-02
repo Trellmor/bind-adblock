@@ -221,17 +221,25 @@ def check_zone(origin, zonefile):
     return r == 0
 
 def rndc_reload(cmd):
-    r = subprocess.call(cmd)
-    if r != 0:
-        raise Exception('rndc failed with return code {}'.format(r))
+    try:
+        r = subprocess.check_output(cmd, stderr=subprocess.PIPE)
+
+    except subprocess.CalledProcessError as e:
+        print( '{}'.format( e.stderr.decode(sys.getfilesystemencoding()) ) )
+        if "multiple" in e.stderr.decode('utf-8'):
+            sys.exit('Please pass --views the list of configured BIND views containing origin zone.')
+        if e.returncode != 0:
+            sys.exit('rndc failed with return code {}'.format(e.returncode))
+
+    print( '{}'.format( r.decode(sys.getfilesystemencoding()) ) )
 
 def reload_zone(origin, views):
     if views:
         for v in views.split():
-            print (f"view {v}, {origin} ", end='', flush=True)
+            print ("view {}, {} ".format(v, origin), end='', flush=True)
             rndc_reload( ['rndc', 'reload', origin, "IN", v] )
     else:
-        print (f"{origin} ", end='', flush=True)
+        print ("{} ".format(origin), end='', flush=True)
         rndc_reload( ['rndc', 'reload', origin] )
 
 def is_exe(fpath):
