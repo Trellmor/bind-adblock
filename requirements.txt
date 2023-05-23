@@ -5,6 +5,6 @@ dnspython==2.3.0
 idna==3.4
 pathlib==1.0.1
 PyYAML==6.0
-requests==2.28.2
+requests==2.31.0
 urllib3==1.26.14
 validators==0.20.0
